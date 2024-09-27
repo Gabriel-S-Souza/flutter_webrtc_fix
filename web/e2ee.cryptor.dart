@@ -5,7 +5,7 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:async';
 
-import 'package:flutter_webrtc/src/web/rtc_transform_stream.dart';
+import 'package:flutter_webrtc_fix/src/web/rtc_transform_stream.dart';
 
 import 'crypto.dart' as crypto;
 import 'e2ee.utils.dart';
@@ -98,8 +98,8 @@ List<int> findNALUIndices(Uint8List stream) {
   var start = 0, pos = 0, searchLength = stream.length - 2;
   while (pos < searchLength) {
     // skip until end of current NALU
-    while (pos < searchLength &&
-        !(stream[pos] == 0 && stream[pos + 1] == 0 && stream[pos + 2] == 1)) {
+    while (
+        pos < searchLength && !(stream[pos] == 0 && stream[pos + 1] == 0 && stream[pos + 2] == 1)) {
       pos++;
     }
     if (pos >= searchLength) pos = stream.length;
@@ -176,8 +176,7 @@ class FrameCryptor {
       }
       ratchetMaterial(currentMaterial).then((newMaterial) {
         deriveKeys(newMaterial, keyOptions.ratchetSalt).then((newKeySet) {
-          setKeySetFromMaterial(newKeySet, keyIndex ?? currentKeyIndex)
-              .then((_) {
+          setKeySetFromMaterial(newKeySet, keyIndex ?? currentKeyIndex).then((_) {
             _ratchetCompleter!.complete();
             _ratchetCompleter = null;
           });
@@ -191,8 +190,7 @@ class FrameCryptor {
   Future<CryptoKey> ratchetMaterial(CryptoKey currentMaterial) async {
     var newMaterial = await jsutil.promiseToFuture(crypto.importKey(
       'raw',
-      crypto.jsArrayBufferFrom(
-          await ratchet(currentMaterial, keyOptions.ratchetSalt)),
+      crypto.jsArrayBufferFrom(await ratchet(currentMaterial, keyOptions.ratchetSalt)),
       (currentMaterial.algorithm as crypto.Algorithm).name,
       false,
       ['deriveBits', 'deriveKey'],
@@ -206,8 +204,7 @@ class FrameCryptor {
 
   void setParticipantId(String participantId) {
     if (lastError != CryptorError.kOk) {
-      print(
-          'setParticipantId: lastError != CryptorError.kOk, reset state to kNew');
+      print('setParticipantId: lastError != CryptorError.kOk, reset state to kNew');
       lastError = CryptorError.kNew;
     }
     this.participantId = participantId;
@@ -223,8 +220,7 @@ class FrameCryptor {
 
   void setEnabled(bool enabled) {
     if (lastError != CryptorError.kOk) {
-      print(
-          'setEnabled[$enabled]: lastError != CryptorError.kOk, reset state to kNew');
+      print('setEnabled[$enabled]: lastError != CryptorError.kOk, reset state to kNew');
       lastError = CryptorError.kNew;
     }
     this.enabled = enabled;
@@ -255,13 +251,11 @@ class FrameCryptor {
   /// Derives a set of keys from the master key.
   /// See https://tools.ietf.org/html/draft-omara-sframe-00#section-4.3.1
   Future<KeySet> deriveKeys(CryptoKey material, Uint8List salt) async {
-    var algorithmOptions =
-        getAlgoOptions((material.algorithm as crypto.Algorithm).name, salt);
+    var algorithmOptions = getAlgoOptions((material.algorithm as crypto.Algorithm).name, salt);
 
     // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveKey#HKDF
     // https://developer.mozilla.org/en-US/docs/Web/API/HkdfParams
-    var encryptionKey =
-        await jsutil.promiseToFuture<CryptoKey>(crypto.deriveKey(
+    var encryptionKey = await jsutil.promiseToFuture<CryptoKey>(crypto.deriveKey(
       jsutil.jsify(algorithmOptions),
       material,
       jsutil.jsify({'name': 'AES-GCM', 'length': 128}),
@@ -286,15 +280,13 @@ class FrameCryptor {
 
   void updateCodec(String codec) {
     if (lastError != CryptorError.kOk) {
-      print(
-          'updateCodec[$codec]: lastError != CryptorError.kOk, reset state to kNew');
+      print('updateCodec[$codec]: lastError != CryptorError.kOk, reset state to kNew');
       lastError = CryptorError.kNew;
     }
     this.codec = codec;
   }
 
-  Uint8List makeIv(
-      {required int synchronizationSource, required int timestamp}) {
+  Uint8List makeIv({required int synchronizationSource, required int timestamp}) {
     var iv = ByteData(IV_LENGTH);
 
     // having to keep our own send count (similar to a picture id) is not ideal.
@@ -332,10 +324,8 @@ class FrameCryptor {
       print('setting codec on cryptor to $codec');
       this.codec = codec;
     }
-    var transformer = TransformStream(jsutil.jsify({
-      'transform':
-          allowInterop(operation == 'encode' ? encodeFunction : decodeFunction)
-    }));
+    var transformer = TransformStream(jsutil.jsify(
+        {'transform': allowInterop(operation == 'encode' ? encodeFunction : decodeFunction)}));
     try {
       readable.pipeThrough(transformer).pipeTo(writable);
     } catch (e) {
@@ -416,12 +406,10 @@ class FrameCryptor {
     }
 
     try {
-      var headerLength =
-          kind == 'video' ? getUnencryptedBytes(frame, codec) : 1;
+      var headerLength = kind == 'video' ? getUnencryptedBytes(frame, codec) : 1;
       var metaData = frame.getMetadata();
-      var iv = makeIv(
-          synchronizationSource: metaData.synchronizationSource,
-          timestamp: frame.timestamp);
+      var iv =
+          makeIv(synchronizationSource: metaData.synchronizationSource, timestamp: frame.timestamp);
 
       var frameTrailer = ByteData(2);
       frameTrailer.setInt8(0, IV_LENGTH);
@@ -431,8 +419,7 @@ class FrameCryptor {
         crypto.AesGcmParams(
           name: 'AES-GCM',
           iv: crypto.jsArrayBufferFrom(iv),
-          additionalData:
-              crypto.jsArrayBufferFrom(buffer.sublist(0, headerLength)),
+          additionalData: crypto.jsArrayBufferFrom(buffer.sublist(0, headerLength)),
         ),
         secretKey,
         crypto.jsArrayBufferFrom(buffer.sublist(headerLength, buffer.length)),
@@ -500,12 +487,12 @@ class FrameCryptor {
     if (keyOptions.uncryptedMagicBytes != null) {
       var magicBytes = keyOptions.uncryptedMagicBytes!;
       if (buffer.length >= magicBytes.length + 1) {
-        var magicBytesBuffer = buffer.sublist(
-            buffer.length - (magicBytes.length + 1), magicBytes.length);
+        var magicBytesBuffer =
+            buffer.sublist(buffer.length - (magicBytes.length + 1), magicBytes.length);
         if (magicBytesBuffer.toString() == magicBytes.toString()) {
           var finalBuffer = BytesBuilder();
-          finalBuffer.add(Uint8List.fromList(
-              buffer.sublist(0, buffer.length - (magicBytes.length + 1))));
+          finalBuffer
+              .add(Uint8List.fromList(buffer.sublist(0, buffer.length - (magicBytes.length + 1))));
           frame.data = crypto.jsArrayBufferFrom(finalBuffer.toBytes());
           controller.enqueue(frame);
           return;
@@ -514,8 +501,7 @@ class FrameCryptor {
     }
 
     try {
-      var headerLength =
-          kind == 'video' ? getUnencryptedBytes(frame, codec) : 1;
+      var headerLength = kind == 'video' ? getUnencryptedBytes(frame, codec) : 1;
       var metaData = frame.getMetadata();
 
       var frameTrailer = buffer.sublist(buffer.length - 2);
@@ -549,12 +535,10 @@ class FrameCryptor {
             crypto.AesGcmParams(
               name: 'AES-GCM',
               iv: crypto.jsArrayBufferFrom(iv),
-              additionalData:
-                  crypto.jsArrayBufferFrom(buffer.sublist(0, headerLength)),
+              additionalData: crypto.jsArrayBufferFrom(buffer.sublist(0, headerLength)),
             ),
             currentkeySet.encryptionKey,
-            crypto.jsArrayBufferFrom(
-                buffer.sublist(headerLength, buffer.length - ivLength - 2)),
+            crypto.jsArrayBufferFrom(buffer.sublist(headerLength, buffer.length - ivLength - 2)),
           ));
 
           if (currentkeySet != initialKeySet) {
@@ -583,8 +567,8 @@ class FrameCryptor {
           }
         } catch (e) {
           lastError = CryptorError.kInternalError;
-          endDecLoop = ratchetCount >= keyOptions.ratchetWindowSize ||
-              keyOptions.ratchetWindowSize <= 0;
+          endDecLoop =
+              ratchetCount >= keyOptions.ratchetWindowSize || keyOptions.ratchetWindowSize <= 0;
           if (endDecLoop) {
             rethrow;
           }

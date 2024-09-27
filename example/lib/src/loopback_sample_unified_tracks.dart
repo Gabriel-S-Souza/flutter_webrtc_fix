@@ -3,7 +3,7 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc_fix/flutter_webrtc_fix.dart';
 
 class LoopBackSampleUnifiedTracks extends StatefulWidget {
   static String tag = 'loopback_sample_unified_tracks';
@@ -12,13 +12,7 @@ class LoopBackSampleUnifiedTracks extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-const List<String> audioCodecList = <String>[
-  'OPUS',
-  'ISAC',
-  'PCMA',
-  'PCMU',
-  'G729'
-];
+const List<String> audioCodecList = <String>['OPUS', 'ISAC', 'PCMA', 'PCMU', 'G729'];
 const List<String> videoCodecList = <String>['VP8', 'VP9', 'H264', 'AV1'];
 
 class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
@@ -167,8 +161,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
   void initLocalConnection() async {
     if (_localPeerConnection != null) return;
     try {
-      _localPeerConnection =
-          await createPeerConnection(_configuration, _constraints);
+      _localPeerConnection = await createPeerConnection(_configuration, _constraints);
 
       _localPeerConnection!.onSignalingState = _onLocalSignalingState;
       _localPeerConnection!.onIceGatheringState = _onLocalIceGatheringState;
@@ -223,8 +216,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
       );
       await _remotePeerConnection!.addCandidate(candidate);
     } catch (e) {
-      print(
-          'Unable to add candidate ${localCandidate.candidate} to remote connection');
+      print('Unable to add candidate ${localCandidate.candidate} to remote connection');
     }
   }
 
@@ -238,8 +230,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
       );
       await _localPeerConnection!.addCandidate(candidate);
     } catch (e) {
-      print(
-          'Unable to add candidate ${remoteCandidate.candidate} to local connection');
+      print('Unable to add candidate ${remoteCandidate.candidate} to local connection');
     }
   }
 
@@ -272,8 +263,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
       ratchetWindowSize: 16,
     );
 
-    _keyProvider ??=
-        await _frameCyrptorFactory.createDefaultKeyProvider(keyProviderOptions);
+    _keyProvider ??= await _frameCyrptorFactory.createDefaultKeyProvider(keyProviderOptions);
     var acaps = await getRtpSenderCapabilities('audio');
     print('sender audio capabilities: ${acaps.toMap()}');
 
@@ -283,8 +273,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
     if (_remotePeerConnection != null) return;
 
     try {
-      _remotePeerConnection =
-          await createPeerConnection(_configuration, _constraints);
+      _remotePeerConnection = await createPeerConnection(_configuration, _constraints);
 
       _remotePeerConnection!.onTrack = _onTrack;
       _remotePeerConnection!.onSignalingState = _onRemoteSignalingState;
@@ -292,8 +281,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
       _remotePeerConnection!.onIceConnectionState = _onRemoteIceConnectionState;
       _remotePeerConnection!.onConnectionState = _onRemotePeerConnectionState;
       _remotePeerConnection!.onIceCandidate = _onRemoteCandidate;
-      _remotePeerConnection!.onRenegotiationNeeded =
-          _onRemoteRenegotiationNeeded;
+      _remotePeerConnection!.onRenegotiationNeeded = _onRemoteRenegotiationNeeded;
 
       await _negotiate();
     } catch (e) {
@@ -340,14 +328,13 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
       var trackId = element.track?.id;
       var id = kind + '_' + trackId! + '_sender';
       if (!_frameCyrptors.containsKey(id)) {
-        var frameCyrptor =
-            await _frameCyrptorFactory.createFrameCryptorForRtpSender(
-                participantId: id,
-                sender: element,
-                algorithm: Algorithm.kAesGcm,
-                keyProvider: _keyProvider!);
-        frameCyrptor.onFrameCryptorStateChanged = (participantId, state) =>
-            print('EN onFrameCryptorStateChanged $participantId $state');
+        var frameCyrptor = await _frameCyrptorFactory.createFrameCryptorForRtpSender(
+            participantId: id,
+            sender: element,
+            algorithm: Algorithm.kAesGcm,
+            keyProvider: _keyProvider!);
+        frameCyrptor.onFrameCryptorStateChanged =
+            (participantId, state) => print('EN onFrameCryptorStateChanged $participantId $state');
         _frameCyrptors[id] = frameCyrptor;
         await frameCyrptor.setKeyIndex(0);
       }
@@ -363,8 +350,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
       } else {
         await _frameCyrptor?.setEnabled(false);
       }
-      await _frameCyrptor?.updateCodec(
-          kind == 'video' ? videoDropdownValue : audioDropdownValue);
+      await _frameCyrptor?.updateCodec(kind == 'video' ? videoDropdownValue : audioDropdownValue);
     });
   }
 
@@ -376,14 +362,13 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
       var trackId = element.track?.id;
       var id = kind + '_' + trackId! + '_receiver';
       if (!_frameCyrptors.containsKey(id)) {
-        var frameCyrptor =
-            await _frameCyrptorFactory.createFrameCryptorForRtpReceiver(
-                participantId: id,
-                receiver: element,
-                algorithm: Algorithm.kAesGcm,
-                keyProvider: _keyProvider!);
-        frameCyrptor.onFrameCryptorStateChanged = (participantId, state) =>
-            print('DE onFrameCryptorStateChanged $participantId $state');
+        var frameCyrptor = await _frameCyrptorFactory.createFrameCryptorForRtpReceiver(
+            participantId: id,
+            receiver: element,
+            algorithm: Algorithm.kAesGcm,
+            keyProvider: _keyProvider!);
+        frameCyrptor.onFrameCryptorStateChanged =
+            (participantId, state) => print('DE onFrameCryptorStateChanged $participantId $state');
         _frameCyrptors[id] = frameCyrptor;
         await frameCyrptor.setKeyIndex(0);
       }
@@ -395,8 +380,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
       } else {
         await _frameCyrptor?.setEnabled(false);
       }
-      await _frameCyrptor?.updateCodec(
-          kind == 'video' ? videoDropdownValue : audioDropdownValue);
+      await _frameCyrptor?.updateCodec(kind == 'video' ? videoDropdownValue : audioDropdownValue);
     });
   }
 
@@ -415,8 +399,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
   }
 
   void _ratchetKey() async {
-    var newKey = await _keyProvider?.ratchetKey(
-        participantId: _senderParticipantId!, index: 0);
+    var newKey = await _keyProvider?.ratchetKey(participantId: _senderParticipantId!, index: 0);
     print('newKey $newKey');
   }
 
@@ -443,8 +426,8 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
   }
 
   void _startVideo() async {
-    var newStream = await navigator.mediaDevices
-        .getUserMedia(_getMediaConstraints(audio: false, video: true));
+    var newStream =
+        await navigator.mediaDevices.getUserMedia(_getMediaConstraints(audio: false, video: true));
     if (_localStream != null) {
       await _removeExistingVideoTrack();
       var tracks = newStream.getVideoTracks();
@@ -488,8 +471,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
           codecCapability = RTCRtpCodecCapability(
             mimeType: 'video/H264',
             clockRate: 90000,
-            sdpFmtpLine:
-                'level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f',
+            sdpFmtpLine: 'level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f',
           );
           break;
       }
@@ -537,8 +519,8 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
   }
 
   void _startAudio() async {
-    var newStream = await navigator.mediaDevices
-        .getUserMedia(_getMediaConstraints(audio: true, video: false));
+    var newStream =
+        await navigator.mediaDevices.getUserMedia(_getMediaConstraints(audio: true, video: false));
 
     if (_localStream != null) {
       await _removeExistingAudioTrack();
@@ -626,8 +608,8 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
 
   void handleStatsReport(Timer timer) async {
     if (_remotePeerConnection != null && _remoteRenderer.srcObject != null) {
-      var reports = await _remotePeerConnection
-          ?.getStats(_remoteRenderer.srcObject!.getVideoTracks().first);
+      var reports =
+          await _remotePeerConnection?.getStats(_remoteRenderer.srcObject!.getVideoTracks().first);
       reports?.forEach((report) {
         print('report => { ');
         print('    id: ' + report.id + ',');
@@ -691,8 +673,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
     }
   }
 
-  Future<void> _connectionAddTrack(
-      MediaStreamTrack track, MediaStream stream) async {
+  Future<void> _connectionAddTrack(MediaStreamTrack track, MediaStream stream) async {
     var sender = track.kind == 'video' ? _videoSender : _audioSender;
     if (sender != null) {
       print('Have a Sender of kind:${track.kind}');
@@ -765,8 +746,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
                       audioDropdownValue = value!;
                     });
                   },
-                  items: audioCodecList
-                      .map<DropdownMenuItem<String>>((String value) {
+                  items: audioCodecList.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -792,8 +772,7 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
                       videoDropdownValue = value!;
                     });
                   },
-                  items: videoCodecList
-                      .map<DropdownMenuItem<String>>((String value) {
+                  items: videoCodecList.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -916,12 +895,8 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
               Container(
                 decoration: BoxDecoration(color: Colors.black54),
                 child: orientation == Orientation.portrait
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: widgets)
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: widgets),
+                    ? Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: widgets)
+                    : Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: widgets),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
@@ -929,33 +904,26 @@ class _MyAppState extends State<LoopBackSampleUnifiedTracks> {
                   children: [
                     FloatingActionButton(
                         heroTag: null,
-                        backgroundColor:
-                            _micOn ? null : Theme.of(context).disabledColor,
+                        backgroundColor: _micOn ? null : Theme.of(context).disabledColor,
                         tooltip: _micOn ? 'Stop mic' : 'Start mic',
                         onPressed: _micOn ? _stopAudio : _startAudio,
                         child: Icon(_micOn ? Icons.mic : Icons.mic_off)),
                     FloatingActionButton(
                         heroTag: null,
-                        backgroundColor:
-                            _speakerOn ? null : Theme.of(context).disabledColor,
+                        backgroundColor: _speakerOn ? null : Theme.of(context).disabledColor,
                         tooltip: _speakerOn ? 'Stop speaker' : 'Start speaker',
                         onPressed: _switchSpeaker,
-                        child: Icon(_speakerOn
-                            ? Icons.speaker_phone
-                            : Icons.phone_in_talk)),
+                        child: Icon(_speakerOn ? Icons.speaker_phone : Icons.phone_in_talk)),
                     FloatingActionButton(
                       heroTag: null,
-                      backgroundColor:
-                          _cameraOn ? null : Theme.of(context).disabledColor,
+                      backgroundColor: _cameraOn ? null : Theme.of(context).disabledColor,
                       tooltip: _cameraOn ? 'Stop camera' : 'Start camera',
                       onPressed: _cameraOn ? _stopVideo : _startVideo,
-                      child:
-                          Icon(_cameraOn ? Icons.videocam : Icons.videocam_off),
+                      child: Icon(_cameraOn ? Icons.videocam : Icons.videocam_off),
                     ),
                     FloatingActionButton(
                       heroTag: null,
-                      backgroundColor:
-                          _inCalling ? null : Theme.of(context).disabledColor,
+                      backgroundColor: _inCalling ? null : Theme.of(context).disabledColor,
                       onPressed: _inCalling ? _hangUp : _makeCall,
                       tooltip: _inCalling ? 'Hangup' : 'Call',
                       child: Icon(_inCalling ? Icons.call_end : Icons.phone),

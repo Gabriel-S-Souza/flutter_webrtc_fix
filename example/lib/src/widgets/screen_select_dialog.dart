@@ -1,14 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc_fix/flutter_webrtc_fix.dart';
 
 class ThumbnailWidget extends StatefulWidget {
   const ThumbnailWidget(
-      {Key? key,
-      required this.source,
-      required this.selected,
-      required this.onTap})
+      {Key? key, required this.source, required this.selected, required this.onTap})
       : super(key: key);
   final DesktopCapturerSource source;
   final bool selected;
@@ -47,8 +44,7 @@ class _ThumbnailWidgetState extends State<ThumbnailWidget> {
         Expanded(
             child: Container(
           decoration: widget.selected
-              ? BoxDecoration(
-                  border: Border.all(width: 2, color: Colors.blueAccent))
+              ? BoxDecoration(border: Border.all(width: 2, color: Colors.blueAccent))
               : null,
           child: InkWell(
             onTap: () {
@@ -69,8 +65,7 @@ class _ThumbnailWidgetState extends State<ThumbnailWidget> {
           style: TextStyle(
               fontSize: 12,
               color: Colors.black87,
-              fontWeight:
-                  widget.selected ? FontWeight.bold : FontWeight.normal),
+              fontWeight: widget.selected ? FontWeight.bold : FontWeight.normal),
         ),
       ],
     );
@@ -93,8 +88,7 @@ class ScreenSelectDialog extends Dialog {
       _stateSetter?.call(() {});
     }));
 
-    _subscriptions
-        .add(desktopCapturer.onThumbnailChanged.stream.listen((source) {
+    _subscriptions.add(desktopCapturer.onThumbnailChanged.stream.listen((source) {
       _stateSetter?.call(() {});
     }));
   }
@@ -125,8 +119,7 @@ class ScreenSelectDialog extends Dialog {
     try {
       var sources = await desktopCapturer.getSources(types: [_sourceType]);
       sources.forEach((element) {
-        print(
-            'name: ${element.name}, id: ${element.id}, type: ${element.type}');
+        print('name: ${element.name}, id: ${element.id}, type: ${element.type}');
       });
       _timer?.cancel();
       _timer = Timer.periodic(Duration(seconds: 3), (timer) {
@@ -190,11 +183,9 @@ class ScreenSelectDialog extends Dialog {
                           Container(
                             constraints: BoxConstraints.expand(height: 24),
                             child: TabBar(
-                                onTap: (value) => Future.delayed(
-                                        Duration(milliseconds: 300), () {
-                                      _sourceType = value == 0
-                                          ? SourceType.Screen
-                                          : SourceType.Window;
+                                onTap: (value) => Future.delayed(Duration(milliseconds: 300), () {
+                                      _sourceType =
+                                          value == 0 ? SourceType.Screen : SourceType.Window;
                                       _getSources();
                                     }),
                                 tabs: [
@@ -224,8 +215,7 @@ class ScreenSelectDialog extends Dialog {
                                         crossAxisCount: 2,
                                         children: _sources.entries
                                             .where((element) =>
-                                                element.value.type ==
-                                                SourceType.Screen)
+                                                element.value.type == SourceType.Screen)
                                             .map((e) => ThumbnailWidget(
                                                   onTap: (source) {
                                                     setState(() {
@@ -233,9 +223,7 @@ class ScreenSelectDialog extends Dialog {
                                                     });
                                                   },
                                                   source: e.value,
-                                                  selected:
-                                                      _selected_source?.id ==
-                                                          e.value.id,
+                                                  selected: _selected_source?.id == e.value.id,
                                                 ))
                                             .toList(),
                                       ),
@@ -248,8 +236,7 @@ class ScreenSelectDialog extends Dialog {
                                         crossAxisCount: 3,
                                         children: _sources.entries
                                             .where((element) =>
-                                                element.value.type ==
-                                                SourceType.Window)
+                                                element.value.type == SourceType.Window)
                                             .map((e) => ThumbnailWidget(
                                                   onTap: (source) {
                                                     setState(() {
@@ -257,9 +244,7 @@ class ScreenSelectDialog extends Dialog {
                                                     });
                                                   },
                                                   source: e.value,
-                                                  selected:
-                                                      _selected_source?.id ==
-                                                          e.value.id,
+                                                  selected: _selected_source?.id == e.value.id,
                                                 ))
                                             .toList(),
                                       ),

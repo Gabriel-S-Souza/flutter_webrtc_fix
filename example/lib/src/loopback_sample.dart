@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc_fix/flutter_webrtc_fix.dart';
 
 class LoopBackSample extends StatefulWidget {
   static String tag = 'loopback_sample';
@@ -131,8 +131,7 @@ class _MyAppState extends State<LoopBackSample> {
       'audio': true,
       'video': {
         'mandatory': {
-          'minWidth':
-              '640', // Provide your own width, height and frame rate here
+          'minWidth': '640', // Provide your own width, height and frame rate here
           'minHeight': '480',
           'minFrameRate': '30',
         },
@@ -166,8 +165,7 @@ class _MyAppState extends State<LoopBackSample> {
     if (_peerConnection != null) return;
 
     try {
-      _peerConnection =
-          await createPeerConnection(configuration, loopbackConstraints);
+      _peerConnection = await createPeerConnection(configuration, loopbackConstraints);
 
       _peerConnection!.onSignalingState = _onSignalingState;
       _peerConnection!.onIceGatheringState = _onIceGatheringState;
@@ -176,8 +174,7 @@ class _MyAppState extends State<LoopBackSample> {
       _peerConnection!.onIceCandidate = _onCandidate;
       _peerConnection!.onRenegotiationNeeded = _onRenegotiationNeeded;
 
-      _localStream =
-          await navigator.mediaDevices.getUserMedia(mediaConstraints);
+      _localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
       _localRenderer.srcObject = _localStream;
 
       switch (sdpSemantics) {
@@ -295,8 +292,7 @@ class _MyAppState extends State<LoopBackSample> {
   }
 
   void _sendDtmf() async {
-    var rtpSender =
-        _senders.firstWhere((element) => element.track?.kind == 'audio');
+    var rtpSender = _senders.firstWhere((element) => element.track?.kind == 'audio');
     var dtmfSender = rtpSender.dtmfSender;
     await dtmfSender.insertDTMF('123#');
   }
@@ -329,12 +325,8 @@ class _MyAppState extends State<LoopBackSample> {
             child: Container(
               decoration: BoxDecoration(color: Colors.black54),
               child: orientation == Orientation.portrait
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: widgets)
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: widgets),
+                  ? Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: widgets)
+                  : Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: widgets),
             ),
           );
         },

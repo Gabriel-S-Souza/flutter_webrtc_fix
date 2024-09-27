@@ -2,14 +2,13 @@ import 'dart:async';
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc_fix/flutter_webrtc_fix.dart';
 
 class DataChannelLoopBackSample extends StatefulWidget {
   static String tag = 'data_channel_sample';
 
   @override
-  _DataChannelLoopBackSampleState createState() =>
-      _DataChannelLoopBackSampleState();
+  _DataChannelLoopBackSampleState createState() => _DataChannelLoopBackSampleState();
 }
 
 class _DataChannelLoopBackSampleState extends State<DataChannelLoopBackSample> {
@@ -43,8 +42,7 @@ class _DataChannelLoopBackSampleState extends State<DataChannelLoopBackSample> {
         _pc1!.addCandidate(candidate);
       };
 
-      _dc1 =
-          await _pc1!.createDataChannel('pc1-dc', RTCDataChannelInit()..id = 1);
+      _dc1 = await _pc1!.createDataChannel('pc1-dc', RTCDataChannelInit()..id = 1);
 
       _pc2!.onDataChannel = (channel) {
         _dc2 = channel;
@@ -57,8 +55,7 @@ class _DataChannelLoopBackSampleState extends State<DataChannelLoopBackSample> {
           setState(() {
             _dc2Status += '\ndc2: Received message: ${data.text}';
           });
-          _dc2!.send(
-              RTCDataChannelMessage('(dc2 ==> dc1) Hello from dc2 echo !!!'));
+          _dc2!.send(RTCDataChannelMessage('(dc2 ==> dc1) Hello from dc2 echo !!!'));
         };
       };
 

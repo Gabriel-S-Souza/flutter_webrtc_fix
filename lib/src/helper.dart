@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import '../flutter_webrtc.dart';
+import '../flutter_webrtc_fix.dart';
 import 'native/media_stream_track_impl.dart';
 
 class Helper {
@@ -15,16 +15,14 @@ class Helper {
   /// Note: Make sure to call this gettet after
   /// navigator.mediaDevices.getUserMedia(), otherwise the devices will not be
   /// listed.
-  static Future<List<MediaDeviceInfo>> get cameras =>
-      enumerateDevices('videoinput');
+  static Future<List<MediaDeviceInfo>> get cameras => enumerateDevices('videoinput');
 
   /// Return the available audiooutputs
   ///
   /// Note: Make sure to call this gettet after
   /// navigator.mediaDevices.getUserMedia(), otherwise the devices will not be
   /// listed.
-  static Future<List<MediaDeviceInfo>> get audiooutputs =>
-      enumerateDevices('audiooutput');
+  static Future<List<MediaDeviceInfo>> get audiooutputs => enumerateDevices('audiooutput');
 
   /// Used to select a specific audio output device.
   ///
@@ -36,8 +34,7 @@ class Helper {
   /// speaker and the preferred device
   /// web: flutter web can use RTCVideoRenderer.audioOutput instead
   static Future<void> selectAudioOutput(String deviceId) async {
-    await navigator.mediaDevices
-        .selectAudioOutput(AudioOutputOptions(deviceId: deviceId));
+    await navigator.mediaDevices.selectAudioOutput(AudioOutputOptions(deviceId: deviceId));
   }
 
   /// Set audio input device for Flutter native
@@ -133,8 +130,7 @@ class Helper {
         await WebRTC.invokeMethod('setVolume', <String, dynamic>{
           'trackId': track.id,
           'volume': volume,
-          'peerConnectionId':
-              track is MediaStreamTrackNative ? track.peerConnectionId : null
+          'peerConnectionId': track is MediaStreamTrackNative ? track.peerConnectionId : null
         });
       }
     }

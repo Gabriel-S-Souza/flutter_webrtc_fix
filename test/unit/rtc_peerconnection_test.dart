@@ -2,8 +2,8 @@ import 'package:flutter/services.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flutter_webrtc/src/native/rtc_data_channel_impl.dart';
-import 'package:flutter_webrtc/src/native/rtc_peerconnection_impl.dart';
+import 'package:flutter_webrtc_fix/src/native/rtc_data_channel_impl.dart';
+import 'package:flutter_webrtc_fix/src/native/rtc_peerconnection_impl.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -11,11 +11,9 @@ void main() {
   setUp(() {
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
       await ServicesBinding.instance.defaultBinaryMessenger
-          .handlePlatformMessage(
-              'FlutterWebRTC/peerConnectionEvent', null, (ByteData? data) {});
+          .handlePlatformMessage('FlutterWebRTC/peerConnectionEvent', null, (ByteData? data) {});
       await ServicesBinding.instance.defaultBinaryMessenger
-          .handlePlatformMessage(
-              'FlutterWebRTC/dataChannelEvent', null, (ByteData? data) {});
+          .handlePlatformMessage('FlutterWebRTC/dataChannelEvent', null, (ByteData? data) {});
     });
   });
 

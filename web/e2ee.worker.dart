@@ -6,7 +6,7 @@ import 'package:js/js.dart';
 
 import 'e2ee.cryptor.dart';
 
-import 'package:flutter_webrtc/src/web/rtc_transform_stream.dart';
+import 'package:flutter_webrtc_fix/src/web/rtc_transform_stream.dart';
 import 'package:collection/collection.dart';
 
 @JS()
@@ -39,8 +39,7 @@ class EnableTransformMessage {
 @anonymous
 @JS()
 class RemoveTransformMessage {
-  external factory RemoveTransformMessage(
-      {String msgType, String participantId, String trackId});
+  external factory RemoveTransformMessage({String msgType, String participantId, String trackId});
   external String get msgType; // 'removeTransform'
   external String get participantId;
   external String get trackId;
@@ -79,8 +78,7 @@ void main() async {
       var codec = options.codec;
       var msgType = options.msgType;
 
-      var cryptor =
-          participantCryptors.firstWhereOrNull((c) => c.trackId == trackId);
+      var cryptor = participantCryptors.firstWhereOrNull((c) => c.trackId == trackId);
 
       if (cryptor == null) {
         cryptor = FrameCryptor(
@@ -110,12 +108,10 @@ void main() async {
         var options = msg['keyOptions'];
         keyProviderOptions = KeyOptions(
             sharedKey: options['sharedKey'],
-            ratchetSalt: Uint8List.fromList(
-                base64Decode(options['ratchetSalt'] as String)),
+            ratchetSalt: Uint8List.fromList(base64Decode(options['ratchetSalt'] as String)),
             ratchetWindowSize: options['ratchetWindowSize'],
             uncryptedMagicBytes: options['ratchetSalt'] != null
-                ? Uint8List.fromList(
-                    base64Decode(options['uncryptedMagicBytes'] as String))
+                ? Uint8List.fromList(base64Decode(options['uncryptedMagicBytes'] as String))
                 : null);
         print('worker: init with keyOptions ${keyProviderOptions.toString()}');
         break;
@@ -124,9 +120,8 @@ void main() async {
           var enabled = msg['enabled'] as bool;
           var participantId = msg['participantId'] as String;
           print('worker: set enable $enabled for participantId $participantId');
-          var cryptors = participantCryptors
-              .where((c) => c.participantId == participantId)
-              .toList();
+          var cryptors =
+              participantCryptors.where((c) => c.participantId == participantId).toList();
           for (var cryptor in cryptors) {
             cryptor.setEnabled(enabled);
           }
@@ -149,8 +144,7 @@ void main() async {
 
           print(
               'worker: got $msgType, kind $kind, trackId $trackId, participantId $participantId, ${readable.runtimeType} ${writable.runtimeType}}');
-          var cryptor =
-              participantCryptors.firstWhereOrNull((c) => c.trackId == trackId);
+          var cryptor = participantCryptors.firstWhereOrNull((c) => c.trackId == trackId);
 
           if (cryptor == null) {
             cryptor = FrameCryptor(
@@ -201,9 +195,8 @@ void main() async {
             }
             return;
           }
-          var cryptors = participantCryptors
-              .where((c) => c.participantId == participantId)
-              .toList();
+          var cryptors =
+              participantCryptors.where((c) => c.participantId == participantId).toList();
           for (var c in cryptors) {
             c.setKey(keyIndex, key);
           }
@@ -213,16 +206,13 @@ void main() async {
         {
           var keyIndex = msg['keyIndex'];
           var participantId = msg['participantId'] as String;
-          print(
-              'worker: ratchetKey for participant $participantId, keyIndex $keyIndex');
-          var cryptors = participantCryptors
-              .where((c) => c.participantId == participantId)
-              .toList();
+          print('worker: ratchetKey for participant $participantId, keyIndex $keyIndex');
+          var cryptors =
+              participantCryptors.where((c) => c.participantId == participantId).toList();
           for (var c in cryptors) {
             var keySet = c.getKeySet(keyIndex);
             c.ratchetKey(keyIndex).then((_) async {
-              var newKey = await c.ratchet(
-                  keySet!.material, keyProviderOptions.ratchetSalt);
+              var newKey = await c.ratchet(keySet!.material, keyProviderOptions.ratchetSalt);
               self.postMessage({
                 'type': 'ratchetKey',
                 'participantId': participantId,
@@ -238,9 +228,8 @@ void main() async {
           var keyIndex = msg['index'];
           var participantId = msg['participantId'] as String;
           print('worker: setup key index for participant $participantId');
-          var cryptors = participantCryptors
-              .where((c) => c.participantId == participantId)
-              .toList();
+          var cryptors =
+              participantCryptors.where((c) => c.participantId == participantId).toList();
           for (var c in cryptors) {
             c.setKeyIndex(keyIndex);
           }
@@ -251,8 +240,7 @@ void main() async {
           var codec = msg['codec'] as String;
           var trackId = msg['trackId'] as String;
           print('worker: update codec for trackId $trackId, codec $codec');
-          var cryptor =
-              participantCryptors.firstWhereOrNull((c) => c.trackId == trackId);
+          var cryptor = participantCryptors.firstWhereOrNull((c) => c.trackId == trackId);
           cryptor?.updateCodec(codec);
         }
         break;
@@ -260,8 +248,7 @@ void main() async {
         {
           var trackId = msg['trackId'] as String;
           print('worker: dispose trackId $trackId');
-          var cryptor =
-              participantCryptors.firstWhereOrNull((c) => c.trackId == trackId);
+          var cryptor = participantCryptors.firstWhereOrNull((c) => c.trackId == trackId);
           if (cryptor != null) {
             cryptor.lastError = CryptorError.kDisposed;
             self.postMessage({

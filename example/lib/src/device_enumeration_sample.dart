@@ -3,7 +3,7 @@ import 'package:collection/collection.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc_fix/flutter_webrtc_fix.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class VideoSize {
@@ -29,8 +29,7 @@ class DeviceEnumerationSample extends StatefulWidget {
   static String tag = 'DeviceEnumerationSample';
 
   @override
-  _DeviceEnumerationSampleState createState() =>
-      _DeviceEnumerationSampleState();
+  _DeviceEnumerationSampleState createState() => _DeviceEnumerationSampleState();
 }
 
 class _DeviceEnumerationSampleState extends State<DeviceEnumerationSample> {
@@ -53,9 +52,9 @@ class _DeviceEnumerationSampleState extends State<DeviceEnumerationSample> {
   String? _selectedVideoInputId;
   String? _selectedAudioInputId;
 
-  MediaDeviceInfo get selectedAudioInput => audioInputs.firstWhere(
-      (device) => device.deviceId == _selectedVideoInputId,
-      orElse: () => audioInputs.first);
+  MediaDeviceInfo get selectedAudioInput =>
+      audioInputs.firstWhere((device) => device.deviceId == _selectedVideoInputId,
+          orElse: () => audioInputs.first);
 
   String? _selectedVideoFPS = '30';
 
@@ -176,8 +175,7 @@ class _DeviceEnumerationSampleState extends State<DeviceEnumerationSample> {
 
     var newLocalStream = await navigator.mediaDevices.getUserMedia({
       'audio': {
-        if (_selectedAudioInputId != null && kIsWeb)
-          'deviceId': _selectedAudioInputId,
+        if (_selectedAudioInputId != null && kIsWeb) 'deviceId': _selectedAudioInputId,
         if (_selectedAudioInputId != null && !kIsWeb)
           'optional': [
             {'sourceId': _selectedAudioInputId}
@@ -189,8 +187,7 @@ class _DeviceEnumerationSampleState extends State<DeviceEnumerationSample> {
     // replace track.
     var newTrack = newLocalStream.getAudioTracks().first;
     print('track.settings ' + newTrack.getSettings().toString());
-    var sender =
-        senders.firstWhereOrNull((sender) => sender.track?.kind == 'audio');
+    var sender = senders.firstWhereOrNull((sender) => sender.track?.kind == 'audio');
     await sender?.replaceTrack(newTrack);
   }
 
@@ -218,8 +215,7 @@ class _DeviceEnumerationSampleState extends State<DeviceEnumerationSample> {
     var newLocalStream = await navigator.mediaDevices.getUserMedia({
       'audio': false,
       'video': {
-        if (_selectedVideoInputId != null && kIsWeb)
-          'deviceId': _selectedVideoInputId,
+        if (_selectedVideoInputId != null && kIsWeb) 'deviceId': _selectedVideoInputId,
         if (_selectedVideoInputId != null && !kIsWeb)
           'optional': [
             {'sourceId': _selectedVideoInputId}
@@ -234,11 +230,9 @@ class _DeviceEnumerationSampleState extends State<DeviceEnumerationSample> {
     // replace track.
     var newTrack = _localStream?.getVideoTracks().first;
     print('track.settings ' + newTrack!.getSettings().toString());
-    var sender =
-        senders.firstWhereOrNull((sender) => sender.track?.kind == 'video');
+    var sender = senders.firstWhereOrNull((sender) => sender.track?.kind == 'video');
     var params = sender!.parameters;
-    print('params degradationPreference' +
-        params.degradationPreference.toString());
+    print('params degradationPreference' + params.degradationPreference.toString());
     params.degradationPreference = RTCDegradationPreference.MAINTAIN_RESOLUTION;
     await sender.setParameters(params);
     await sender.replaceTrack(newTrack);
@@ -254,8 +248,7 @@ class _DeviceEnumerationSampleState extends State<DeviceEnumerationSample> {
       _localStream = await navigator.mediaDevices.getUserMedia({
         'audio': true,
         'video': {
-          if (_selectedVideoInputId != null && kIsWeb)
-            'deviceId': _selectedVideoInputId,
+          if (_selectedVideoInputId != null && kIsWeb) 'deviceId': _selectedVideoInputId,
           if (_selectedVideoInputId != null && !kIsWeb)
             'optional': [
               {'sourceId': _selectedVideoInputId}
@@ -311,9 +304,7 @@ class _DeviceEnumerationSampleState extends State<DeviceEnumerationSample> {
             onSelected: _selectAudioInput,
             icon: Icon(Icons.settings_voice),
             itemBuilder: (BuildContext context) {
-              return _devices
-                  .where((device) => device.kind == 'audioinput')
-                  .map((device) {
+              return _devices.where((device) => device.kind == 'audioinput').map((device) {
                 return PopupMenuItem<String>(
                   value: device.deviceId,
                   child: Text(device.label),
@@ -325,9 +316,7 @@ class _DeviceEnumerationSampleState extends State<DeviceEnumerationSample> {
             onSelected: _selectAudioOutput,
             icon: Icon(Icons.volume_down_alt),
             itemBuilder: (BuildContext context) {
-              return _devices
-                  .where((device) => device.kind == 'audiooutput')
-                  .map((device) {
+              return _devices.where((device) => device.kind == 'audiooutput').map((device) {
                 return PopupMenuItem<String>(
                   value: device.deviceId,
                   child: Text(device.label),
@@ -339,9 +328,7 @@ class _DeviceEnumerationSampleState extends State<DeviceEnumerationSample> {
             onSelected: _selectVideoInput,
             icon: Icon(Icons.switch_camera),
             itemBuilder: (BuildContext context) {
-              return _devices
-                  .where((device) => device.kind == 'videoinput')
-                  .map((device) {
+              return _devices.where((device) => device.kind == 'videoinput').map((device) {
                 return PopupMenuItem<String>(
                   value: device.deviceId,
                   child: Text(device.label),

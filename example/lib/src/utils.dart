@@ -1,4 +1,4 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc_fix/flutter_webrtc_fix.dart';
 import 'package:sdp_transform/sdp_transform.dart' as sdp_transform;
 
 void setPreferredCodec(RTCSessionDescription description,
@@ -6,18 +6,16 @@ void setPreferredCodec(RTCSessionDescription description,
   var capSel = CodecCapabilitySelector(description.sdp!);
   var acaps = capSel.getCapabilities('audio');
   if (acaps != null) {
-    acaps.codecs = acaps.codecs
-        .where((e) => (e['codec'] as String).toLowerCase() == audio)
-        .toList();
+    acaps.codecs =
+        acaps.codecs.where((e) => (e['codec'] as String).toLowerCase() == audio).toList();
     acaps.setCodecPreferences('audio', acaps.codecs);
     capSel.setCapabilities(acaps);
   }
 
   var vcaps = capSel.getCapabilities('video');
   if (vcaps != null) {
-    vcaps.codecs = vcaps.codecs
-        .where((e) => (e['codec'] as String).toLowerCase() == video)
-        .toList();
+    vcaps.codecs =
+        vcaps.codecs.where((e) => (e['codec'] as String).toLowerCase() == video).toList();
     vcaps.setCodecPreferences('video', vcaps.codecs);
     capSel.setCapabilities(vcaps);
   }
@@ -25,8 +23,7 @@ void setPreferredCodec(RTCSessionDescription description,
 }
 
 class CodecCapability {
-  CodecCapability(
-      this.kind, this.payloads, this.codecs, this.fmtp, this.rtcpFb) {
+  CodecCapability(this.kind, this.payloads, this.codecs, this.fmtp, this.rtcpFb) {
     codecs.forEach((element) {
       element['orign_payload'] = element['payload'];
     });
@@ -118,7 +115,6 @@ class CodecCapabilitySelector {
 
   Map<String, dynamic>? _mline(String kind) {
     var mlist = _session['media'] as List<dynamic>;
-    return mlist.firstWhere((element) => element['type'] == kind,
-        orElse: () => null);
+    return mlist.firstWhere((element) => element['type'] == kind, orElse: () => null);
   }
 }
